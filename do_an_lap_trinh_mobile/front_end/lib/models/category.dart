@@ -1,14 +1,19 @@
 class Category {
-  final String title;
-  final String image;
+  final String id;
+  final String name; // Thay title thành name
+  final String? image;
 
-  Category({required this.title, required this.image});
+  Category({required this.id, required this.name, this.image});
+
+  factory Category.fromJson(Map<String, dynamic> json, String docId) {
+    return Category(
+      id: docId,
+      name: json['name'] ?? '', // Sử dụng name thay vì title
+      image: json['image'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'name': name, 'image': image};
+  }
 }
-
-final List<Category> categories = [
-  Category(title: "Shoes", image: "images/logo3.png"),
-  Category(title: "Beauty", image: "images/logo2.png"),
-  Category(title: "women's\nFashion", image: "images/logo7.jpg"),
-  Category(title: "man's\nFashion", image: "images/logo7.jpg"),
-  Category(title: "man's\nShoes", image: "images/logo7.jpg"),
-];

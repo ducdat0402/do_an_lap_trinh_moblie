@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "609309128387",
+    "project_id": "doanmobile-ac032",
+    "storage_bucket": "doanmobile-ac032.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:609309128387:android:a327528afcc08f7e5a1476",
+        "android_client_info": {
+          "package_name": "com.example.do_an_lap_trinh_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "609309128387-3oci2k31lka2elaci4n6caujvj3a2o5d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.do_an_lap_trinh_mobile",
+            "certificate_hash": "94c42be7a6476e689651c644aef9d14d1f8f1e5d"
+          }
+        },
+        {
+          "client_id": "609309128387-u0ta1b6br42odv28qf179qftarrga6r1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPnXydooSBFUlJ3Y-olBrLibPjuRa-0zg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "609309128387-u0ta1b6br42odv28qf179qftarrga6r1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "609309128387-dbil3mc19ni09im65ivci3bnkm3da4cv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.doAnLapTrinhMobile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

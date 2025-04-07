@@ -1,6 +1,8 @@
-import 'package:do_an_lap_trinh_mobile/screens/Home/Widget/app_widget.dart';
-import 'package:do_an_lap_trinh_mobile/screens/login/login_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:do_an_lap_trinh_mobile/screens/login/login_screen.dart';
+import 'package:do_an_lap_trinh_mobile/screens/Home/Widget/app_widget.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -15,6 +17,66 @@ class _SignUpState extends State<SignUpScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+
+  bool _isLoading = false; // Thêm trạng thái loading
+
+  // Xử lý đăng ký tài khoản
+  Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true; // Hiển thị loading
+    });
+
+    try {
+      // Tạo tài khoản trên Firebase Authentication
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // Lưu thông tin người dùng vào Firestore
+        await FirebaseFirestore.instance.collection("users").doc(user.uid).set({
+          "id": user.uid, // Lưu ID người dùng
+          "name": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "role": "user", // Mặc định user mới sẽ có role = "user"
+          "createdAt": Timestamp.now(),
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Đăng ký thành công! Vui lòng đăng nhập."),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Chuyển hướng đến LoginScreen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = "Đăng ký thất bại!";
+      if (e.code == 'email-already-in-use') {
+        message = "Email này đã được sử dụng.";
+      } else if (e.code == 'weak-password') {
+        message = "Mật khẩu quá yếu.";
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Ẩn loading
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +127,7 @@ class _SignUpState extends State<SignUpScreen> {
                     ),
                   ),
 
-               const   SizedBox(height: 50.0),
+                  const SizedBox(height: 50.0),
 
                   /// Form Box
                   Material(
@@ -74,7 +136,6 @@ class _SignUpState extends State<SignUpScreen> {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 20.0),
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.8,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -88,7 +149,7 @@ class _SignUpState extends State<SignUpScreen> {
                               "Sign up",
                               style: AppWidget.HeadlineTextFeildStyle(),
                             ),
-                       const     SizedBox(height: 15.0),
+                            const SizedBox(height: 15.0),
 
                             /// Name Input
                             TextFormField(
@@ -98,9 +159,15 @@ class _SignUpState extends State<SignUpScreen> {
                                 hintStyle: AppWidget.semiBoldTextFeildStyle(),
                                 prefixIcon: Icon(Icons.person_outlined),
                               ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return "Vui lòng nhập tên.";
+                                }
+                                return null;
+                              },
                             ),
 
-                   const         SizedBox(height: 15.0),
+                            const SizedBox(height: 15.0),
 
                             /// Email Input
                             TextFormField(
@@ -110,9 +177,15 @@ class _SignUpState extends State<SignUpScreen> {
                                 hintStyle: AppWidget.semiBoldTextFeildStyle(),
                                 prefixIcon: Icon(Icons.email_outlined),
                               ),
+                              validator: (value) {
+                                if (value!.isEmpty || !value.contains('@')) {
+                                  return "Vui lòng nhập email hợp lệ.";
+                                }
+                                return null;
+                              },
                             ),
 
-                        const    SizedBox(height: 15.0),
+                            const SizedBox(height: 15.0),
 
                             /// Password Input
                             TextFormField(
@@ -123,10 +196,19 @@ class _SignUpState extends State<SignUpScreen> {
                                 hintStyle: AppWidget.semiBoldTextFeildStyle(),
                                 prefixIcon: Icon(Icons.key_off_sharp),
                               ),
+                              validator: (value) {
+                                if (value!.length < 6) {
+                                  return "Mật khẩu phải có ít nhất 6 ký tự.";
+                                }
+                                return null;
+                              },
                             ),
-                            SizedBox(height: 15.0),
+
+                            const SizedBox(height: 15.0),
+
+                            /// Confirm Password Input
                             TextFormField(
-                              // controller: confirmPasswordController,
+                              controller: confirmPasswordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                 hintText: 'Confirm Password',
@@ -135,20 +217,19 @@ class _SignUpState extends State<SignUpScreen> {
                               ),
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return "Please enter confirm password";
+                                  return "Vui lòng nhập xác nhận mật khẩu.";
                                 } else if (value != passwordController.text) {
-                                  return "Passwords do not match";
+                                  return "Mật khẩu không khớp.";
                                 }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 80.0),
+
+                            SizedBox(height: 50.0),
 
                             /// Sign Up Button
                             GestureDetector(
-                              onTap: () {
-                                // Ấn vào nhưng chưa có xử lý logic
-                              },
+                              onTap: _signUp,
                               child: Material(
                                 elevation: 5.0,
                                 borderRadius: BorderRadius.circular(20),
@@ -160,15 +241,19 @@ class _SignUpState extends State<SignUpScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Center(
-                                    child: const Text(
-                                      "SIGN UP",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18.0,
-                                        fontFamily: 'Poppins1',
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    child:
+                                        _isLoading
+                                            ? CircularProgressIndicator(
+                                              color: Colors.white,
+                                            )
+                                            : Text(
+                                              "SIGN UP",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
                                   ),
                                 ),
                               ),
@@ -179,9 +264,7 @@ class _SignUpState extends State<SignUpScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 70.0),
-
-                  /// Login Option
+                  SizedBox(height: 50.0),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -189,10 +272,7 @@ class _SignUpState extends State<SignUpScreen> {
                         MaterialPageRoute(builder: (context) => LoginScreen()),
                       );
                     },
-                    child: Text(
-                      "Already have an account? Login",
-                      style: AppWidget.semiBoldTextFeildStyle(),
-                    ),
+                    child: Text("Already have an account? Login"),
                   ),
                 ],
               ),

@@ -1,7 +1,8 @@
 import 'package:do_an_lap_trinh_mobile/screens/Cart/cart_screen.dart';
-import 'package:do_an_lap_trinh_mobile/screens/admin_work/controller_screen.dart';
 import 'package:do_an_lap_trinh_mobile/screens/favorite/favorite_screen.dart';
 import 'package:do_an_lap_trinh_mobile/screens/Home/home_screen.dart';
+import 'package:do_an_lap_trinh_mobile/screens/profile/profile_screen.dart';
+import 'package:do_an_lap_trinh_mobile/support/support_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
@@ -16,11 +17,11 @@ class BottomNavBar extends StatefulWidget {
 class _BottomNavBarState extends State<BottomNavBar> {
   int currentIndex = 2;
   List screens = [
-    AdminDashboard(),
-    Favorite(),
+    SupportScreen(),
+    FavoriteScreen(),
     HomeScreen(),
     CartScreen(),
-    Scaffold(),
+    ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
