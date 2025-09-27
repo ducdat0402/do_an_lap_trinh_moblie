@@ -6,7 +6,6 @@ import 'package:do_an_lap_trinh_mobile/screens/login/forgot_password.dart';
 import 'package:do_an_lap_trinh_mobile/screens/login/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +16,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  //////////////////////
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -84,35 +82,6 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Đăng nhập bằng Google thất bại")),
-      );
-    }
-  }
-
-  // Đăng nhập bằng Facebook
-  Future<void> _signInWithFacebook() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    AuthService authService = AuthService();
-    var response = await authService.signInWithFacebook();
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response != null && response is Map<String, dynamic>) {
-      UserModel user = response['user'];
-      String? role = response['role'];
-
-      if (role == 'admin') {
-        Navigator.pushReplacementNamed(context, "/admin");
-      } else {
-        Navigator.pushReplacementNamed(context, "/home");
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Đăng nhập bằng Facebook thất bại")),
       );
     }
   }
@@ -323,51 +292,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                         SizedBox(width: 8),
                                         Text(
                                           "Google",
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 18.0,
-                                            fontFamily: 'Poppins1',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 20.0),
-
-                            /// Đăng nhập bằng Facebook
-                            GestureDetector(
-                              onTap: _isLoading ? null : _signInWithFacebook,
-                              child: Material(
-                                elevation: 5.0,
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0,
-                                  ),
-                                  width: 200,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: Colors.grey),
-                                  ),
-                                  child: const Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.facebook,
-                                          color: Colors.blue,
-                                          size: 30,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          "Facebook",
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontSize: 18.0,

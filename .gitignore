@@ -1,0 +1,37 @@
+# Flutter/Dart/Pub related
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Flutter/Debug.xcconfig
+**/ios/Flutter/Release.xcconfig
+**/ios/Flutter/AppFrameworkInfo.plist
+**/ios/Flutter/Generated.xcconfig
+**/android/app/google-services.json
+**/android/app/build
+**/android/build
+**/build/
+.dart_tool/
+.packages
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Firebase
+google-services.json
+firebase_options.dart
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Miscellaneous
+*.log
+*.swp
+*.swo
+*.bak
+*.tmp

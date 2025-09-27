@@ -81,6 +81,9 @@ class AuthService {
     try {
       // Khởi tạo Google Sign-In
       final GoogleSignIn googleSignIn = GoogleSignIn();
+      // Đăng xuất Google trước khi đăng nhập mới
+      await googleSignIn.signOut();
+      // Yêu cầu người dùng đăng nhập
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -138,66 +141,6 @@ class AuthService {
       return {'user': userModel, 'role': userModel.role};
     } catch (e) {
       print("Đăng nhập Google thất bại: $e");
-      return null;
-    }
-  }
-
-  // Đăng nhập bằng Facebook
-  Future<Map<String, dynamic>?> signInWithFacebook() async {
-    try {
-      print("Bắt đầu đăng nhập Facebook...");
-      final LoginResult loginResult = await FacebookAuth.instance.login();
-      print(
-        "Login result: ${loginResult.status}, message: ${loginResult.message}",
-      );
-
-      if (loginResult.status != LoginStatus.success) {
-        print("Đăng nhập Facebook thất bại: ${loginResult.message}");
-        return null;
-      }
-
-      final AuthCredential credential = FacebookAuthProvider.credential(
-        loginResult.accessToken!.tokenString,
-      );
-      print("Credential created: ${credential.providerId}");
-
-      UserCredential userCredential = await _auth.signInWithCredential(
-        credential,
-      );
-      User? user = userCredential.user;
-      if (user == null) {
-        print("Đăng nhập Facebook thất bại: Không tìm thấy user.");
-        return null;
-      }
-      print("Firebase user: ${user.email}");
-
-      QuerySnapshot existingUsers =
-          await _firestore
-              .collection('users')
-              .where('email', isEqualTo: user.email)
-              .get();
-      if (existingUsers.docs.isNotEmpty) {
-        DocumentSnapshot userDoc = existingUsers.docs.first;
-        UserModel userModel = UserModel.fromJson(
-          userDoc.data() as Map<String, dynamic>,
-        );
-        return {'user': userModel, 'role': userModel.role};
-      }
-
-      UserModel userModel = UserModel(
-        id: user.uid,
-        email: user.email ?? '',
-        name: user.displayName ?? 'Người dùng Facebook',
-        role: user.email!.contains('admin') ? UserRole.admin : UserRole.user,
-      );
-
-      await _firestore
-          .collection('users')
-          .doc(user.uid)
-          .set(userModel.toJson());
-      return {'user': userModel, 'role': userModel.role};
-    } catch (e) {
-      print("Đăng nhập Facebook thất bại: $e");
       return null;
     }
   }
